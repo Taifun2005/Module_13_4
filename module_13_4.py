@@ -14,15 +14,15 @@ class UserState(StatesGroup):
     adres = State()
 
 
-@dp.message_handler(tezt='Заказать')
-async def buy(message):
-    await message.answer('Отправь нам свой адрес пожалуйста')
+@dp.message_handler(text='Заказать')
+async def buy(message: types.Message):
+    await message.answer('Отправь нам свой адрес, пожалуйста.')
     await UserState.adres.set()
 
 
-@dp.message_handler(state=UserState.adres)
+@dp.message_handler(state = UserState.adres)
 async def fsm_handler(message, state):
-    await state.update_data(first=message.text)
+    await state.update_data(first = message.text)
     date = await state.get_data()
     await message.answer(f'Доставка будет отправлена на {data["first"]}')
     await state.finish()
