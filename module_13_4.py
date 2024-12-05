@@ -11,8 +11,50 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 
 
 class UserState(StatesGroup):
-    adres = State()
+    age = State()
+    growth = State()
+    weight  = State()
 
+
+@dp.message_handler(text='Calories')
+async def set_age(message):
+    await message.answer('Введите свой возраст:')
+    await UserState.age.set()
+
+
+@dp.message_handler(state = UserState.age)
+async def set_growth(message, state):
+    await state.update_data(first1 = message.text)
+    # data_age = await state.get_data()
+    await message.answer('Введите свой рост:')
+    await UserState.growth.set()
+
+
+@dp.message_handler(state=UserState.growth)
+async def set_weight(message, state):
+    await state.update_data(first2=message.text)
+    # data_growth = await state.get_data()
+    await message.answer(f'Введите свой вес:')
+    await UserState.weight.set()
+
+
+@dp.message_handler(state=UserState.weight)
+async def send_calories(message, state):
+    await state.update_data(first3=message.text)
+    data = await state.get_data()
+    # norma_call = (10 х UserState.weight) + (6,25 х UserState.weight) – (5 х UserState.growth) + 5.
+    norma_call = (10 * data.weight) + (6,25 * data.weight) - (5 * data.growth) + 5.
+    await message.answer(f'Ваша норма колорий {norma_call}')
+    # Для мужчин: (10 х вес в кг) + (6,25 х рост в см) – (5 х возраст в г) + 5.
+    await UserState.weight.set()
+
+
+
+
+if __name__ == "__main__":
+    executor.start_polling(dp, skip_updates=True)
+
+"""
 
 @dp.message_handler(text='Заказать')
 async def buy(message: types.Message):
@@ -23,15 +65,14 @@ async def buy(message: types.Message):
 @dp.message_handler(state = UserState.adres)
 async def fsm_handler(message, state):
     await state.update_data(first = message.text)
-    date = await state.get_data()
+    data = await state.get_data()
     await message.answer(f'Доставка будет отправлена на {data["first"]}')
     await state.finish()
 
 
-if __name__ == "__main__":
-    executor.start_polling(dp, skip_updates=True)
 
-"""
+
+
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import asyncio
