@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 import asyncio
 
-api = "7890890424:AAEwL3AvXADeymJq1hsVzEH_kAkWYnGdBsc"
+api = ""
 bot = Bot(token=api)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
@@ -45,7 +45,7 @@ async def send_calories(message, state):
     norma_call = (10 * data['weight']) + (6, 25 * data['growth']) - (5 * data['age']) + 5.
     await message.answer(f'Ваша норма колорий {norma_call}')
     # Для мужчин: (10 х вес в кг) + (6,25 х рост в см) – (5 х возраст в г) + 5.
-    await UserState.weight.set()
+    await state.finish()
 
 
 if __name__ == "__main__":
