@@ -4,7 +4,6 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 import asyncio
 
-
 api = "7890890424:AAEwL3AvXADeymJq1hsVzEH_kAkWYnGdBsc"
 bot = Bot(token=api)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -13,7 +12,7 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 class UserState(StatesGroup):
     age = State()
     growth = State()
-    weight  = State()
+    weight = State()
 
 
 @dp.message_handler(text='Calories')
@@ -22,9 +21,9 @@ async def set_age(message):
     await UserState.age.set()
 
 
-@dp.message_handler(state = UserState.age)
+@dp.message_handler(state=UserState.age)
 async def set_growth(message, state):
-    await state.update_data(first1 = message.text)
+    await state.update_data(age=message.text)
     # data_age = await state.get_data()
     await message.answer('Введите свой рост:')
     await UserState.growth.set()
@@ -32,7 +31,7 @@ async def set_growth(message, state):
 
 @dp.message_handler(state=UserState.growth)
 async def set_weight(message, state):
-    await state.update_data(first2=message.text)
+    await state.update_data(growth=message.text)
     # data_growth = await state.get_data()
     await message.answer(f'Введите свой вес:')
     await UserState.weight.set()
@@ -40,15 +39,13 @@ async def set_weight(message, state):
 
 @dp.message_handler(state=UserState.weight)
 async def send_calories(message, state):
-    await state.update_data(first3=message.text)
+    await state.update_data(weight=message.text)
     data = await state.get_data()
     # norma_call = (10 х UserState.weight) + (6,25 х UserState.weight) – (5 х UserState.growth) + 5.
-    norma_call = (10 * data['weight']) + (6,25 * data['growth']) - (5 * data['age']) + 5.
+    norma_call = (10 * data['weight']) + (6, 25 * data['growth']) - (5 * data['age']) + 5.
     await message.answer(f'Ваша норма колорий {norma_call}')
     # Для мужчин: (10 х вес в кг) + (6,25 х рост в см) – (5 х возраст в г) + 5.
     await UserState.weight.set()
-
-
 
 
 if __name__ == "__main__":
